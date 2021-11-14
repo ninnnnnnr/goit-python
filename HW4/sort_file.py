@@ -48,7 +48,9 @@ def scan(folder: Path):
         if item.is_dir():
             if item.name not in ('Images', 'Audio', 'Video', 'Documents', 'Archives'):
                 FOLDERS.append(item)
-                scan(item)
+                with ThreadPoolExecutor(2) as pool:
+                    scan = pool.map(scan, item)
+                    scan()
             continue
         extension = get_extensions(item.name)
         new_name = folder / item.name
@@ -64,7 +66,7 @@ def scan(folder: Path):
                 OTHER.append(new_name)
 
 
-table = {ord('а'): 'a', ord('б'): 'b', ord(
+TABLE = {ord('а'): 'a', ord('б'): 'b', ord(
     'в'): 'v', ord('г'): 'h', ord('ґ'): 'g',
     ord('д'): 'd', ord('е'): 'e', ord('є'): 'ie',
     ord('ж'): 'zh', ord('з'): 'z', ord('и'): 'y',
@@ -90,10 +92,9 @@ table = {ord('а'): 'a', ord('б'): 'b', ord(
 
 
 def normalize(text):
-    text = text.translate(table)
+    text = text.translate(TABLE)
     clean_text = re.sub(r'[^\w\s]', '_', text)
-    text = clean_text
-    return text
+    return clean_text
 
 
 def moov(file: Path, root_folder: Path, dist: str):
@@ -130,33 +131,16 @@ def delete_folder(folder: Path):
 def main(folder):
     folder = Path(folder)
     scan(folder)
-
-    for file in IMAGES:
-        moov(file, folder, 'Images')
-
-    for file in AUDIO:
-        moov(file, folder, 'Audio')
-
-    for file in VIDEO:
-        moov(file, folder, 'Video')
-
-    for file in DOCUMENTS:
-        moov(file, folder, 'Documents')
-
-    for file in OTHER:
-        moov(file, folder, 'Other')
-
+    for elements in [IMAGES, AUDIO, VIDEO, DOCUMENTS, OTHER]:
+        for file in elements:
+            moov(file, folder, str(elements).capitalize())
     for file in ARCHIVES:
         moov_archive(file, folder, 'Archives')
-
     for f in FOLDERS:
         delete_folder(f)
-
 
 if __name__ == '__main__':
 
     input_arg = input('Enter the directory for sorting ')
     sort_folder = Path(input_arg)
-
-    with ThreadPoolExecutor(2) as pool:
-        main(sort_folder)
+    main(sort_folder)
