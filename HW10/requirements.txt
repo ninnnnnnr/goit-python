@@ -1,0 +1,4 @@
+Deprecated==1.2.13
+pymongo==4.0.1
+redis==4.0.2
+wrapt==1.13.3
