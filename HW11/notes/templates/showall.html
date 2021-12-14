@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Контактная Книга{% endblock %}
+{% block body %}
+<h1>Все контакты</h1>
+<div class="container mt-5">
+{% if contacts|length > 0 %}
+    {% for elem in contacts %}
+        <div class="alert alert-info">
+        <p><b>Имя: </b>{{elem.name}} <b>Телефон: </b>{{elem.phone_number}} <b>email: </b>{{elem.email}} <b>Дата: </b>{{elem.date.date()}}</p>
+        <a href="/showall/{{ elem.id }}/edit" class="btn btn-warning">Редактировать</a>
+            <a href="/showall/{{ elem.id }}/delete" class="btn btn-danger">Удалить</a>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        <p><b> Контактов еще нет </b></p>
+        <a href="/addcontact" class="btn btn-warning">Добавить контакт</a>
+    </div>
+{% endif %}
+</div>
+{% endblock %}
