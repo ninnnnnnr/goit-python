@@ -1,0 +1,67 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="alert alert-info">
+    <h1>Список расходов</h1>
+    <h3>Добавить расход</h3>
+    <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="Добавить" />
+    </form>
+</div>
+<div class="container">
+        <form action="" method="get">
+<table style="width:90%">
+    <caption align="top">Поиск по дате</caption>
+<tr>
+<td> Start date </td>
+<td><input type="date"  class="datepicker" name="start_date"> </td>
+<td> End date </td>
+<td><input type="date"  class="datepicker" name="end_date"></td>
+<br>
+<td><input type="submit" value="Search"></td>
+</tr>
+</table>
+</form>
+    {% if costs_list %}
+    <style>
+    table {
+        width: 100%;
+    }
+   </style>
+   <table border="1" align="center">
+   <tr>
+    <th>Сумма</th>
+    <th>Категория</th>
+    <th>Комментарий</th>
+    <th>Дата</th>
+   </tr>
+   {% for cost in costs_list %}
+   <tr><td>{{ cost.cash_out }}</td><td>{{ cost.get_categories_display }}</td><td>{{ cost.comment }}</td><td>{{ cost.pub_date }}</td></tr>
+   {% endfor %}
+   </table>
+    <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; 1</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+    {% else %}
+      <p>Купи себе что нибудь.</p>
+    {% endif %}
+    </div>
+{% endblock %}
