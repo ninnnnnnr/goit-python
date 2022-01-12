@@ -1,23 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
-
+import queries
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ContactBook.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
-class ContactBook(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), nullable=False)
-    phone_number = db.Column(db.String(250), nullable=False)
-    email = db.Column(db.String(250), nullable=False)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __repr__(self):
-        return '<ContactBook %r>' % self.id
 
 
 @app.route('/addcontact', methods=['POST', 'GET'])
@@ -26,7 +15,7 @@ def add_contact():
         name = request.form['name']
         phone_number = request.form['phone_number']
         email = request.form['email']
-        contacnt_add = ContactBook(name=name, phone_number=phone_number, email=email)
+        contacnt_add = queries.contacnt_add(name, phone_number, email)
         try:
             db.session.add(contacnt_add)
             db.session.commit()
@@ -40,13 +29,13 @@ def add_contact():
 @app.route('/')
 @app.route('/showall')
 def showall():
-    contacts = ContactBook.query.order_by(ContactBook.date.desc()).all()
+    contacts = queries.showall()
     return render_template("showall.html", contacts=contacts)
 
 
 @app.route('/showall/<int:id>/delete')
 def delete_contact(id):
-    delete = ContactBook.query.get(id)
+    delete = queries.delete_contact(id)
     try:
         db.session.delete(delete)
         db.session.commit()
@@ -57,7 +46,7 @@ def delete_contact(id):
 
 @app.route('/showall/<int:id>/edit', methods=['POST', 'GET'])
 def edit_contact(id):
-    contact = ContactBook.query.get(id)
+    contact = queries.edit_contact(id)
     if request.method == 'POST':
         contact.name = request.form['name']
         contact.phone_number = request.form['phone_number']
@@ -73,11 +62,3 @@ def edit_contact(id):
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
-
-
-
-
