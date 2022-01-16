@@ -71,17 +71,17 @@ class SpyderPipeline(object):
         self.session = Session(bind=self.engine)
 
 
-# class DuplicatesPipeline(object):
-#     def __init__(self):
-#         self.authors = set()
-#
-#     def process_item(self, item, spider):
-#         if isinstance(item, SpyderItem):
-#             authors = item['author'] + item['url']
-#             if authors in self.authors:
-#                 raise DropItem("Duplicate item found: %s" % item)
-#             else:
-#                 self.authors.add(item['id'])
-#                 return item
-#         else:
-#             return item
+class DuplicatesPipeline(object):
+    def __init__(self):
+        self.authors = set()
+
+    def process_item(self, item, spider):
+        if isinstance(item, SpyderItem):
+            authors = item['author'] + item['url']
+            if authors in self.authors:
+                raise DropItem("Duplicate item found: %s" % item)
+            else:
+                self.authors.add(item['id'])
+                return item
+        else:
+            return item
